@@ -69,9 +69,9 @@ app.get('/stats', async (req, res) => {
     }
 });
 
-// routes (to be added)
-// app.use('/api/videos', require('./routes/videos'));
-// app.use('/api/search', require('./routes/search'));
+// routes 
+app.use('/api/videos', require('./routes/videos'));
+app.use('/api/search', require('./routes/search'));
 
 // error handling middleware
 app.use((err, req, res, next) => {
@@ -93,7 +93,7 @@ const connectDB = async () => {
         });
         console.log('connected to MongoDB');
 
-        // Start background job after successful DB connection
+        // start background job after successful DB connection
         startBackgroundJob();
 
     } catch (error) {
