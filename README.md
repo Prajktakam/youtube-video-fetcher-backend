@@ -213,4 +213,3 @@ Visit http://localhost:3000/dashboard for dashboard with important endpoints
 
 - Health check endpoint for service monitoring
 - Statistics endpoint for database insights
-- Detailed logging for debugging and monitoring
