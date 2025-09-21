@@ -73,6 +73,43 @@ app.get('/stats', async (req, res) => {
 app.use('/api/videos', require('./routes/videos'));
 app.use('/api/search', require('./routes/search'));
 
+// Simple dashboard endpoint (bonus feature)
+app.get('/dashboard', async (req, res) => {
+    try {
+        const stats = await Video.countDocuments();
+        const latest = await Video.findOne().sort({ publishedAt: -1 }).select('title publishedAt');
+
+        res.send(`
+      <!DOCTYPE html>
+      <html>
+      <head><title>YouTube Video Fetcher Dashboard</title></head>
+      <body style="font-family: Arial, sans-serif; margin: 40px;">
+        <h1>YouTube Video Fetcher Dashboard</h1>
+        <div style="background: #f5f5f5; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3>Statistics</h3>
+          <p><strong>Total Videos:</strong> ${stats}</p>
+          <p><strong>Latest Video:</strong> ${latest ? latest.title : 'None'}</p>
+          <p><strong>Last Updated:</strong> ${latest ? latest.publishedAt : 'Never'}</p>
+        </div>
+        <div style="background: #e8f4fd; padding: 20px; border-radius: 8px;">
+          <h3>API Endpoints</h3>
+          <p><a href="/api/videos" target="_blank">View All Videos</a></p>
+          <p><a href="/api/search?q=music" target="_blank">Search Example (music)</a></p>
+          <p><a href="/api/videos/stats" target="_blank">Statistics</a></p>
+          <p><a href="/health" target="_blank">Health Check</a></p>
+        </div>
+        <p style="margin-top: 30px; color: #666;">
+          Search Query: <strong>${process.env.SEARCH_QUERY}</strong> | 
+          Fetch Interval: <strong>${process.env.FETCH_INTERVAL_SECONDS}s</strong>
+        </p>
+      </body>
+      </html>
+    `);
+    } catch (error) {
+        res.status(500).send('Dashboard unavailable');
+    }
+});
+
 // error handling middleware
 app.use((err, req, res, next) => {
     console.error(err.stack);
@@ -87,10 +124,7 @@ app.use((req, res) => {
 // mongoDB connection
 const connectDB = async () => {
     try {
-        await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log('connected to MongoDB');
 
         // start background job after successful DB connection

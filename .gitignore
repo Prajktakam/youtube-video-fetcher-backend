@@ -4,3 +4,5 @@ node_modules/
 .dockerignore
 Dockerfile
 docker-compose*.yml
+
+/data
